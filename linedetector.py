@@ -69,8 +69,6 @@ class LineDetector:
                         right_y1 += y1
                         right_y2 += y2
                         right_count += 1
-                    else:
-                        pass
 
         if left_count > 0:
             left_x1 = left_x1 // left_count
@@ -97,7 +95,10 @@ class LineDetector:
                 right = r
                 break
 
-        self.direction_info = [left, right]
+        self.left_right = [left, right]
+
+    def get_left_right(self):
+        return self.left_right
 
     def show_image(self):
         pass
