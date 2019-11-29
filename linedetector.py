@@ -59,7 +59,7 @@ class LineDetector:
                     dx = float(x2 - x1)
                     if dy / dx <= -0.2:
                         left_x1 += x1
-                        left_x2 += z2
+                        left_x2 += x2
                         left_y1 += y1
                         left_y2 += y2
                         left_count += 1

@@ -4,7 +4,6 @@ import rospy
 import time
 
 from linedetector import LineDetector
-# from obstacledetector import ObstacleDetector
 from motordriver import MotorDriver
 
 
@@ -16,7 +15,7 @@ class AutoDrive:
         self.driver = MotorDriver('/xycar_motor_msg')
 
     def trace(self):
-        left, right = self.line_detector.direction_info
+        left, right = self.line_detector.get_left_right()
         angle = self.steer(left, right)
         speed = self.accelerate(angle)
         self.driver.drive(angle + 90, speed + 90)

@@ -20,7 +20,7 @@ def callback(img_data):
 
 
 def lane_slope(frame):
-    roi = frame[v:v + scan_height, :]
+    roi = frame[250:250 + 80, :]
 
     roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     roi = cv2.GaussianBlur(roi, (5, 5), 0)
