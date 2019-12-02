@@ -44,5 +44,4 @@ if __name__ == '__main__':
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
         car.trace()
-        rate.sleep()
     rospy.on_shutdown(car.exit)

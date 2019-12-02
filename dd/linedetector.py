@@ -1,7 +1,6 @@
 import rospy
 import cv2
 import numpy as np
-import math
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
@@ -25,12 +24,12 @@ class LineDetector:
     def conv_image(self, data):
         self.cam_img = self.bridge.imgmsg_to_cv2(data, 'bgr8')
         v = roi_vertical_pos
-        roi = self.cam_img[250:330, :]
+        roi = self.cam_img[230:330, :]
 
         roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-        roi = cv2.GaussianBlur(roi, (3, 3), 0)
+        roi = cv2.GaussianBlur(roi, (7, 7), 0)
         roi = cv2.Canny(roi, 70, 140)
-        lines = cv2.HoughLines(roi, 1, np.pi / 180, 85, None, 0, 0)
+        lines = cv2.HoughLines(roi, 1, np.pi / 180, 75, None, 0, 0)
 
         left_x1 = 0
         left_x2 = 0
