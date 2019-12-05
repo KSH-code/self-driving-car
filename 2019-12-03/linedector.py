@@ -6,9 +6,10 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
 image_width = 640
-scan_height = 100
-row_begin = 50
-lmid, rmid = 200, 440
+scan_width, scan_height = 300, 80
+roi_vertical_pos = 220
+row_begin = scan_height // 2 - 10
+lmid, rmid = scan_width, image_width - scan_width
 
 
 class LineDetector:
@@ -23,12 +24,13 @@ class LineDetector:
 
     def conv_image(self, data):
         self.cam_img = self.bridge.imgmsg_to_cv2(data, 'bgr8')
-        roi = self.cam_img[220:320, :]
+        v = roi_vertical_pos
+        roi = self.cam_img[250:330, :]
 
         roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         roi = cv2.GaussianBlur(roi, (5, 5), 0)
         roi = cv2.Canny(roi, 70, 140)
-        lines = cv2.HoughLines(roi, 1, np.pi / 180, 75, None, 0, 0)
+        lines = cv2.HoughLines(roi, 1, np.pi / 180, 80, None, 0, 0)
 
         left_x1 = 0
         left_x2 = 0

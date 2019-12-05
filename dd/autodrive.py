@@ -15,24 +15,23 @@ class AutoDrive:
         self.driver = MotorDriver('/xycar_motor_msg')
 
     def trace(self):
-        left, right = self.line_detector.get_left_right()
-        angle = self.steer(left, right)
+        angle = self.line_detector.get_left_right()
+        angle = self.steer(angle)
         speed = self.accelerate(angle)
         self.driver.drive(angle + 90, speed + 90)
 
-    def steer(self, left, right):
-        print(left, right)
-        mid = (left + right) // 2 - 320
-        angle = mid // 1.7
+    def steer(self, angle):
+        if abs(angle) < 7:
+            angle *= 1.2
+        else:
+            angle *= 3.25
         angle = max(-50, angle) if angle < 0 else min(50, angle)
         return angle
 
     def accelerate(self, angle):
-        if angle <= -10 or angle >= 10:
-            speed = 20
-        else:
-            speed = 25
-        return speed
+        if abs(angle) > 7:
+            return 20
+        return 25
 
     def exit(self):
         print('finished')

@@ -20,6 +20,18 @@ def callback(img_data):
 
 def lane_slope(roi):
     lines = cv2.HoughLines(roi, 1, np.pi / 180, 75, None, 0, 0)
+
+    left_x1 = 0
+    left_x2 = 0
+    left_y1 = 0
+    left_y2 = 0
+    right_x1 = 0
+    right_x2 = 0
+    right_y1 = 0
+    right_y2 = 0
+    left_count = 0
+    right_count = 0
+
     if lines is not None:
         for line in lines:
             for rho, theta in line:
@@ -31,13 +43,36 @@ def lane_slope(roi):
                 y1 = int(y0 + 1000 * (a))
                 x2 = int(x0 - 1000 * (-b))
                 y2 = int(y0 - 1000 * (a))
+
                 dy = float(y2 - y1)
                 dx = float(x2 - x1)
-                if dx != 0:
-                    if dy / dx <= -0.2:
-                        cv2.line(roi, (x1, y1), (x2, y2), (255, 255, 255), 8)
-                    if dy / dx >= 0.2:
-                        cv2.line(roi, (x1, y1), (x2, y2), (255, 255, 255), 8)
+                if dy / dx <= -0.2:
+                    left_x1 += x1
+                    left_x2 += x2
+                    left_y1 += y1
+                    left_y2 += y2
+                    left_count += 1
+                elif dy / dx >= 0.2:
+                    right_x1 += x1
+                    right_x2 += x2
+                    right_y1 += y1
+                    right_y2 += y2
+                    right_count += 1
+
+    if left_count > 0:
+        left_x1 = left_x1 // left_count
+        left_x2 = left_x2 // left_count
+        left_y1 = left_y1 // left_count
+        left_y2 = left_y2 // left_count
+        cv2.line(roi, (left_x1, left_y1), (left_x2,
+                                           left_y2), (255, 255, 255), 3, cv2.LINE_AA)
+    if right_count > 0:
+        right_x1 = right_x1 // right_count
+        right_x2 = right_x2 // right_count
+        right_y1 = right_y1 // right_count
+        right_y2 = right_y2 // right_count
+        cv2.line(roi, (right_x1, right_y1), (right_x2,
+                                             right_y2), (255, 255, 255), 3, cv2.LINE_AA)
     return 0
 
 
@@ -47,9 +82,9 @@ if __name__ == "__main__":
     time.sleep(1)
     while not rospy.is_shutdown():
         gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
-        blur = cv2.GaussianBlur(gray, (3, 3), 0)
+        blur = cv2.GaussianBlur(gray, (5, 5), 0)
         canny = cv2.Canny(blur, 70, 140)
-        roi = canny[230:330, :]
+        roi = canny[220:320, :]
         lane_slope(roi)
         cv2.imshow("full", roi)
         # cv2.imshow("left", l_aoi)

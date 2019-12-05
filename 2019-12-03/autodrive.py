@@ -21,17 +21,18 @@ class AutoDrive:
         self.driver.drive(angle + 90, speed + 90)
 
     def steer(self, left, right):
+        print(left, right)
         mid = (left + right) // 2 - 320
-        print(left, right, mid)
-        if abs(mid) > 40:
-            angle = mid // 1.5
-        else:
-            angle = mid // 3.5
+        angle = mid // 1.7
         angle = max(-50, angle) if angle < 0 else min(50, angle)
         return angle
 
     def accelerate(self, angle):
-        return 50
+        if angle <= -10 or angle >= 10:
+            speed = 20
+        else:
+            speed = 25
+        return speed
 
     def exit(self):
         print('finished')
