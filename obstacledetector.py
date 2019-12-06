@@ -1,6 +1,7 @@
 import rospy
 from std_msgs.msg import Int32MultiArray
 
+
 class ObstacleDetector:
 
     def __init__(self, topic):
