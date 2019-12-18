@@ -21,14 +21,26 @@ class LineDetector:
         self.left_right = [-40, 680]
         rospy.Subscriber(topic, Image, self.conv_image)
         self.traffic_light_detected_count = 0
+        self.rrr = np.zeros(shape=(480, 640, 3), dtype=np.uint8)
 
     def conv_image(self, data):
         self.cam_img = self.bridge.imgmsg_to_cv2(data, 'bgr8')
         self.detect_line()
-        self.detect_taffic_light()
-
-    def detect_taffic_light(self):
         frame = cv2.GaussianBlur(self.cam_img, (3, 3), 0)
+        self.detect_obstacle(frame)
+        self.detect_taffic_light(frame)
+
+    def detect_obstacle(self, frame):
+        lower_red = np.array([150, 100, 50])
+        upper_red = np.array([180, 255, 200])
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        mask_red = cv2.inRange(hsv, lower_red, upper_red)
+        if cv2.countNonZero(mask_red[0:240, :320]) > 5000:
+            self.left_right = 'left'
+        if cv2.countNonZero(mask_red[0:240, 320:]) > 5000:
+            self.left_right = 'right'
+
+    def detect_taffic_light(self, frame):
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1,
                                    100, param1=20, param2=50, minRadius=0, maxRadius=40)
@@ -62,10 +74,8 @@ class LineDetector:
 
     def detect_line(self):
         if self.traffic_light_detected_count > 0:
-            print(self.traffic_light_detected_count)
             self.traffic_light_detected_count -= 1
             return
-        self.left_right = [-40, 680]
         roi = self.cam_img[270:370, :]
 
         roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
@@ -138,8 +148,7 @@ class LineDetector:
             if np.all(result[row_begin, r] == [255, 255, 255]):
                 right = r
                 break
-        if left != -40 or right != 680:
-            self.left_right = [left, right]
+        self.left_right = [left, right]
 
     def get_left_right(self):
         return self.left_right

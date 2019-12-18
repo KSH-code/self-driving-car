@@ -5,7 +5,6 @@ import time
 
 from linedetector import LineDetector
 from motordriver import MotorDriver
-from obstacledetector import ObstacleDetector
 
 
 class AutoDrive:
@@ -14,13 +13,17 @@ class AutoDrive:
         rospy.init_node('xycar_driver')
         self.line_detector = LineDetector('/usb_cam/image_raw')
         self.driver = MotorDriver('/xycar_motor_msg')
-        self.obstacledetector = ObstacleDetector('/ultrasonic')
 
     def trace(self):
         result = self.line_detector.get_left_right()
         if result:
-            left, right = result
-            angle = self.steer(left, right)
+            if result == 'left':
+                angle = 30
+            elif result == 'right':
+                angle = -30
+            else:
+                left, right = result
+                angle = self.steer(left, right)
             speed = self.accelerate(angle)
         else:
             angle = 0
@@ -37,7 +40,7 @@ class AutoDrive:
         return angle
 
     def accelerate(self, angle):
-        return 35
+        return 31
 
     def exit(self):
         print('finished')
